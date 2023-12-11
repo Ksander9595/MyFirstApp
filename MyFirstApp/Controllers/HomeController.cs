@@ -1,32 +1,37 @@
 using Microsoft.AspNetCore.Mvc;
 using MyFirstApp.Models;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using MyFirstApp.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MyFirstApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        ApplicationContext db;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationContext context)
         {
-            _logger = logger;
+            db = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
+        {
+            return View(await db.Users.ToListAsync());
+        }
+
+        public IActionResult Create()
         {
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpPost]
+        public async Task<IActionResult> Create(User user)
         {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            db.Users.Add(user);
+            await db.SaveChangesAsync();
+            return RedirectToAction("Index");
         }
     }
 }
