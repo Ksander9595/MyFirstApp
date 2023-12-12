@@ -40,9 +40,9 @@ namespace MyFirstApp.Controllers
         {
             IQueryable<User>? users = db.Users.Include(x => x.Company);
 
-            ViewData["NameSort"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
-            ViewData["AgeSort"] = sortOrder == SortState.AgeAsc ? SortState.AgeDesc : SortState.AgeAsc;
-            ViewData["CompSort"] = sortOrder == SortState.CompanyAsc ? SortState.CompanyDesc : SortState.CompanyAsc;
+            //ViewData["NameSort"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
+            //ViewData["AgeSort"] = sortOrder == SortState.AgeAsc ? SortState.AgeDesc : SortState.AgeAsc;
+            //ViewData["CompSort"] = sortOrder == SortState.CompanyAsc ? SortState.CompanyDesc : SortState.CompanyAsc;
 
             users = sortOrder switch
             {
@@ -53,7 +53,14 @@ namespace MyFirstApp.Controllers
                 SortState.CompanyDesc => users.OrderByDescending(s => s.Company!.Name),
                 _ => users.OrderBy(s => s.Name),
             };
-            return View(await users.AsNoTracking().ToListAsync());//AsNoTracking данные не помещаются в кэш, просто для отображения
+
+            IndexViewModel viewModel = new IndexViewModel
+            {
+                Users = await users.AsNoTracking().ToListAsync(),
+                SortViewModel = new SortViewModel(sortOrder)
+            };
+
+            return View(viewModel);
         }
 
         
