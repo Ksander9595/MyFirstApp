@@ -1,22 +1,29 @@
-﻿@model IEnumerable<MyFirstApp.Models.User>
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using MyFirstApp.Models
+@model IEnumerable<User>
 
 <h2>Users List</h2>
-<p><a asp-action="Create">Add User</a></p>
-<table class="table">
-    <tr><th>Name</th><th>Age</th><th></th><th></th></tr>
-    @foreach (var item in Model)
+
+<table>
+    <tr>
+        <th>
+            <a asp-action="Index" asp-route-sortOrder="@ViewBag.NameSort">
+                Name
+            </a>
+        </th>
+        <th>
+            <a asp-action="Index" asp-route-sortOrder="@ViewBag.AgeSort">
+                Age
+            </a>
+        </th>
+        <th>
+            <a asp-action="Index" asp-route-sortOrder="@ViewBag.CompSort">
+                Company
+            </a>
+        </th>
+    </tr>
+    @foreach (User u in Model)
     {
-        <tr>
-            <td>@item.Name</td>
-            <td>@item.Age</td>
-            <td>
-                <a asp-action="Edit" asp-controller="Home" asp-route-id="@item.Id">Change</a>
-            </td>
-            <td>
-                <form asp-controller="Home" asp-action="Delete" method="post" asp-route-id="@item.Id">
-                    <input type ="submit" value="Delete" />
-                </form>
-            </td>
-        </tr>
+        <tr><td>@u.Name</td><td>@u.Age</td><td>@u.Company?.Name</td></tr>
     }
 </table>
