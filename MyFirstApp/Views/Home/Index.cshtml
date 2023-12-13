@@ -1,28 +1,47 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using MyFirstApp.Models
-@model IEnumerable<User>
+@model IndexViewModel
+@addTagHelper *, MyFirstApp
 
+<style>
+td, th {padding: 0 13px 0 0;}
+
+.glyphicon{
+    border: solid black;
+   border-width: 0 3px 3px 0;
+   display: inline-block;
+   padding: 3px;
+   margin: 0 5px;
+}
+.glyphicon-chevron-down{
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
+.glyphicon-chevron-up{
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+}
+</style>
 <h2>Users List</h2>
-
-<table>
+<table class="table">
     <tr>
         <th>
-            <a asp-action="Index" asp-route-sortOrder="@ViewBag.NameSort">
+            <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.NameSort">
                 Name
-            </a>
+            </sort-header>
         </th>
         <th>
-            <a asp-action="Index" asp-route-sortOrder="@ViewBag.AgeSort">
+            <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.AgeSort">
                 Age
-            </a>
+            </sort-header>
         </th>
         <th>
-            <a asp-action="Index" asp-route-sortOrder="@ViewBag.CompSort">
+            <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.CompanySort">
                 Company
-            </a>
+            </sort-header>
         </th>
     </tr>
-    @foreach (User u in Model)
+    @foreach (User u in Model.Users)
     {
         <tr><td>@u.Name</td><td>@u.Age</td><td>@u.Company?.Name</td></tr>
     }
