@@ -37,14 +37,21 @@ namespace MyFirstApp.Controllers
             }
         }
 
-        public async Task<IActionResult> Index(int? company, string? name)//get
+        public async Task<IActionResult> Index(int page = 1)//get
         {
-            IQueryable<User>? users = db.Users.Include(x => x.Company);
+            int pageSize = 3;
 
+            IQueryable<User> source = db.Users.Include(x => x.Company);
+            var count = await source.CountAsync();
+            var items = await source.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
+            IndexViewModel viewModel = new IndexViewModel(items, pageViewModel);
+            
             //ViewData["NameSort"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
             //ViewData["AgeSort"] = sortOrder == SortState.AgeAsc ? SortState.AgeDesc : SortState.AgeAsc;
             //ViewData["CompSort"] = sortOrder == SortState.CompanyAsc ? SortState.CompanyDesc : SortState.CompanyAsc;
-
+            ///////////////////////////////////////////////////////////////////////////////////////////////////1
             //users = sortOrder switch
             //{
             //    SortState.NameDesc => users.OrderByDescending(s => s.Name),
@@ -60,25 +67,29 @@ namespace MyFirstApp.Controllers
             //    Users = await users.AsNoTracking().ToListAsync(),
             //    SortViewModel = new SortViewModel(sortOrder)
             //};
-            if(company!=null && company!=0)
-            {
-                users = users.Where(p => p.Company.Id == company);
-            }
-            if(!string.IsNullOrEmpty(name))
-            {
-                users = users.Where(p => p.Name!.Contains(name));
-            }
+            ///////////////////////////////////////////////////////////////////////////////////////////////////2
+            //if(company!=null && company!=0)
+            //{
+            //    users = users.Where(p => p.Company.Id == company);
+            //}
+            //if(!string.IsNullOrEmpty(name))
+            //{
+            //    users = users.Where(p => p.Name!.Contains(name));
+            //}
 
-            List<Company> companies = db.Companies.ToList();
+            //List<Company> companies = db.Companies.ToList();
 
-            companies.Insert(0, new Company { Name = "All", Id = 0 });
+            //companies.Insert(0, new Company { Name = "All", Id = 0 });
 
-            UserListViewModel viewModel = new UserListViewModel
-            {
-                Users = users.ToList(),
-                Companies = new SelectList(companies, "Id", "Name", company),
-                Name = name
-            };
+            //UserListViewModel viewModel = new UserListViewModel
+            //{
+            //    Users = users.ToList(),
+            //    Companies = new SelectList(companies, "Id", "Name", company),
+            //    Name = name
+            //};
+            //////////////////////////////////////////////////////////////////////////////////////////////////3
+            
+
             return View(viewModel);
         }
 
