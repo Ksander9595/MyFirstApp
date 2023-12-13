@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MyFirstApp.Models;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 namespace MyFirstApp.Controllers
@@ -36,7 +37,7 @@ namespace MyFirstApp.Controllers
             }
         }
 
-        public async Task<IActionResult> Index(SortState sortOrder = SortState.NameAsc)//по умолчанию = по имени
+        public async Task<IActionResult> Index(int? company, string? name)//get
         {
             IQueryable<User>? users = db.Users.Include(x => x.Company);
 
@@ -44,22 +45,40 @@ namespace MyFirstApp.Controllers
             //ViewData["AgeSort"] = sortOrder == SortState.AgeAsc ? SortState.AgeDesc : SortState.AgeAsc;
             //ViewData["CompSort"] = sortOrder == SortState.CompanyAsc ? SortState.CompanyDesc : SortState.CompanyAsc;
 
-            users = sortOrder switch
-            {
-                SortState.NameDesc => users.OrderByDescending(s => s.Name),
-                SortState.AgeAsc => users.OrderBy(s => s.Age),
-                SortState.AgeDesc => users.OrderByDescending(s => s.Age),
-                SortState.CompanyAsc => users.OrderBy(s => s.Company!.Name),
-                SortState.CompanyDesc => users.OrderByDescending(s => s.Company!.Name),
-                _ => users.OrderBy(s => s.Name),
-            };
+            //users = sortOrder switch
+            //{
+            //    SortState.NameDesc => users.OrderByDescending(s => s.Name),
+            //    SortState.AgeAsc => users.OrderBy(s => s.Age),
+            //    SortState.AgeDesc => users.OrderByDescending(s => s.Age),
+            //    SortState.CompanyAsc => users.OrderBy(s => s.Company!.Name),
+            //    SortState.CompanyDesc => users.OrderByDescending(s => s.Company!.Name),
+            //    _ => users.OrderBy(s => s.Name),
+            //};
 
-            IndexViewModel viewModel = new IndexViewModel
+            //IndexViewModel viewModel = new IndexViewModel
+            //{
+            //    Users = await users.AsNoTracking().ToListAsync(),
+            //    SortViewModel = new SortViewModel(sortOrder)
+            //};
+            if(company!=null && company!=0)
             {
-                Users = await users.AsNoTracking().ToListAsync(),
-                SortViewModel = new SortViewModel(sortOrder)
-            };
+                users = users.Where(p => p.Company.Id == company);
+            }
+            if(!string.IsNullOrEmpty(name))
+            {
+                users = users.Where(p => p.Name!.Contains(name));
+            }
 
+            List<Company> companies = db.Companies.ToList();
+
+            companies.Insert(0, new Company { Name = "All", Id = 0 });
+
+            UserListViewModel viewModel = new UserListViewModel
+            {
+                Users = users.ToList(),
+                Companies = new SelectList(companies, "Id", "Name", company),
+                Name = name
+            };
             return View(viewModel);
         }
 

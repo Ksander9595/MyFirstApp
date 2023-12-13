@@ -1,48 +1,33 @@
-﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@using MyFirstApp.Models
-@model IndexViewModel
-@addTagHelper *, MyFirstApp
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHepler
+@model MyFirstApp.Models.UserListViewModel
 
-<style>
-td, th {padding: 0 13px 0 0;}
+<h2>Users Catalog</h2>
 
-.glyphicon{
-    border: solid black;
-   border-width: 0 3px 3px 0;
-   display: inline-block;
-   padding: 3px;
-   margin: 0 5px;
-}
-.glyphicon-chevron-down{
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-}
-.glyphicon-chevron-up{
-    transform: rotate(-135deg);
-    -webkit-transform: rotate(-135deg);
-}
-</style>
-<h2>Users List</h2>
-<table class="table">
+<form method = "get">
+    <div>
+        <label>Name: </label>
+        <input asp-for="Name" />
+
+        <label>Company: </label>
+        <select name="company" asp-items="Model.Companies"></select>
+
+        <input type="submit" value="Filter" />
+    </div>
+</form>
+
+<table>
     <tr>
-        <th>
-            <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.NameSort">
-                Name
-            </sort-header>
-        </th>
-        <th>
-            <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.AgeSort">
-                Age
-            </sort-header>
-        </th>
-        <th>
-            <sort-header action="Index" up="@Model.SortViewModel.Up" current="@Model.SortViewModel.Current" property="@Model.SortViewModel.CompanySort">
-                Company
-            </sort-header>
-        </th>
+        <th>Имя</th>
+        <th>Возраст</th>
+        <th>Компания</th>
     </tr>
-    @foreach (User u in Model.Users)
+
+    @foreach (var item in Model.Users)
     {
-        <tr><td>@u.Name</td><td>@u.Age</td><td>@u.Company?.Name</td></tr>
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Age</td>
+            <td>@item.Company?.Name</td>
+        </tr>
     }
 </table>
