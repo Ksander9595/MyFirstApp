@@ -1,16 +1,46 @@
-﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHepler
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @using MyFirstApp.Models
 @model IndexViewModel
 
 <style>
-.glyphicon{display: inline-block; padding:0 5px;}
-.glyphicon-chevron-right:after{content: "\00BB";}
-.glyphicon-chevron-left:before{content: "\00AB";}
+    .glyphicon{display:inline-block;padding:0 5px}
+    .glyphicon-chevron-right:after{content:"\00BB";}
+    .glyphicon-chevron-left:before{content:"\00AB";}
 </style>
 
-<h2>Users Catalog</h2>
-<table class="table">
-    <tr><th>Name</th><th>Age</th><th>Company</th></tr>
+<h1>Users Catalog</h1>
+<form method="get">
+    <label>Name: </label>
+    <input name="name" value="@Model.FilterViewModel.SelectedName" />@* Ввод имени, переменная name *@
+    
+    <label>Company: </label>
+    <select name="company" asp-items="Model.FilterViewModel.Companies"></select>@*Список всех компаний*@
+
+    <input type="submit" value="Filter" />
+</form>
+
+<table>
+    <tr>
+        <th>
+            <a action="Index"
+                asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                asp-route-name="@(Model.FilterViewModel.SelectedName)"
+                asp-route-company="@(Model.FilterViewModel.SelectedCompany)">Name</a>
+        </th>
+        <th>
+            <a action="Index"
+                asp-route-sortOrder="@(Model.SortViewModel.AgeSort)"
+                asp-route-name="@(Model.FilterViewModel.SelectedName)"
+                asp-route-company="@(Model.FilterViewModel.SelectedCompany)">Age</a>
+        </th>
+        <th>
+            <a action="Index"
+                asp-route-sortOrder="@(Model.SortViewModel.CompanySort)"
+                asp-route-name="@(Model.FilterViewModel.SelectedName)"
+                asp-route-company="@(Model.FilterViewModel.SelectedCompany)">Company</a>
+        </th>
+    </tr> 
     @foreach(User u in Model.Users)
     {
         <tr><td>@u.Name</td><td>@u.Age</td><td>@u.Company?.Name</td></tr>
@@ -19,14 +49,23 @@
 <p>
     @if(Model.PageViewModel.HasPreviousPage)
     {
-        <a asp-action="Index" asp-route-page="@(Model.PageViewModel.PageNumber - 1)" class="glyphicon glyphicon-chevron-left">
-            Back
+        <a asp-action="Index"
+           asp-route-page="@(Model.PageViewModel.PageNumber-1)"
+           asp-route-name="@(Model.FilterViewModel.SelectedName)"
+           asp-route-company="@(Model.FilterViewModel.SelectedCompany)"
+           asp-route-sortorder="@(Model.SortViewModel.Current)"
+           class="glyphicon glyphicon-chevron-left">Back
         </a>
     }
     @if(Model.PageViewModel.HasNextPage)
     {
-        <a asp-action="Index" asp-route-page="@(Model.PageViewModel.PageNumber + 1)" class="glyphicon glyphicon-chevron-right">
-            Next
+        <a asp-action="Index"
+           asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+           asp-route-name="@(Model.FilterViewModel.SelectedName)"
+           asp-route-company="@(Model.FilterViewModel.SelectedCompany)"
+           asp-route-sortorder="@(Model.SortViewModel.Current)"
+           class="glyphicon glyphicon-chevron-right">Next
         </a>
     }
 </p>
+

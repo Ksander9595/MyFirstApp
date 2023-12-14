@@ -37,58 +37,53 @@ namespace MyFirstApp.Controllers
             }
         }
 
-        public async Task<IActionResult> Index(int page = 1)//get
+        public async Task<IActionResult> Index(string name, int company = 0, int page = 1, SortState sortOrder = SortState.NameAsc)
         {
             int pageSize = 3;
 
-            IQueryable<User> source = db.Users.Include(x => x.Company);
-            var count = await source.CountAsync();
-            var items = await source.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            //фильтрация 
+            IQueryable<User> users = db.Users.Include(x => x.Company);
 
-            PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
-            IndexViewModel viewModel = new IndexViewModel(items, pageViewModel);
-            
-            //ViewData["NameSort"] = sortOrder == SortState.NameAsc ? SortState.NameDesc : SortState.NameAsc;
-            //ViewData["AgeSort"] = sortOrder == SortState.AgeAsc ? SortState.AgeDesc : SortState.AgeAsc;
-            //ViewData["CompSort"] = sortOrder == SortState.CompanyAsc ? SortState.CompanyDesc : SortState.CompanyAsc;
-            ///////////////////////////////////////////////////////////////////////////////////////////////////1
-            //users = sortOrder switch
-            //{
-            //    SortState.NameDesc => users.OrderByDescending(s => s.Name),
-            //    SortState.AgeAsc => users.OrderBy(s => s.Age),
-            //    SortState.AgeDesc => users.OrderByDescending(s => s.Age),
-            //    SortState.CompanyAsc => users.OrderBy(s => s.Company!.Name),
-            //    SortState.CompanyDesc => users.OrderByDescending(s => s.Company!.Name),
-            //    _ => users.OrderBy(s => s.Name),
-            //};
+            if(company != 0)
+            {
+                users=users.Where(p=>p.CompanyId == company);
+            }
+            if(!string.IsNullOrEmpty(name))
+            {
+                users = users.Where(p=>p.Name!.Contains(name));
+            }
 
-            //IndexViewModel viewModel = new IndexViewModel
-            //{
-            //    Users = await users.AsNoTracking().ToListAsync(),
-            //    SortViewModel = new SortViewModel(sortOrder)
-            //};
-            ///////////////////////////////////////////////////////////////////////////////////////////////////2
-            //if(company!=null && company!=0)
-            //{
-            //    users = users.Where(p => p.Company.Id == company);
-            //}
-            //if(!string.IsNullOrEmpty(name))
-            //{
-            //    users = users.Where(p => p.Name!.Contains(name));
-            //}
+            //сортировка
+            switch(sortOrder)
+            {
+                case SortState.NameDesc:
+                    users = users.OrderByDescending(s => s.Name);
+                    break;
+                case SortState.AgeAsc:
+                    users = users.OrderBy(s => s.Age);
+                    break;
+                case SortState.AgeDesc:
+                    users=users.OrderByDescending(s => s.Age);
+                    break;
+                case SortState.CompanyAsc:
+                    users = users.OrderBy(s => s.Company!.Name);
+                    break;
+                case SortState.CompanyDesc:
+                    users=users.OrderByDescending(s=>s.Company!.Name);
+                    break;
+                default:
+                    users=users.OrderBy(s => s.Name);
+                    break;
+            }
+            //пагинация
+            var count = await users.CountAsync();
+            var items = await users.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            //List<Company> companies = db.Companies.ToList();
-
-            //companies.Insert(0, new Company { Name = "All", Id = 0 });
-
-            //UserListViewModel viewModel = new UserListViewModel
-            //{
-            //    Users = users.ToList(),
-            //    Companies = new SelectList(companies, "Id", "Name", company),
-            //    Name = name
-            //};
-            //////////////////////////////////////////////////////////////////////////////////////////////////3
-            
+            //формируем модель представления (ViewModel)
+            IndexViewModel viewModel = new IndexViewModel(items, 
+                new PageViewModel(count, page, pageSize), 
+                new FilterViewModel(db.Companies.ToList(),company, name),
+                new SortViewModel(sortOrder));          
 
             return View(viewModel);
         }
