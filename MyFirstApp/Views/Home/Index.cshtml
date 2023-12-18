@@ -1,13 +1,11 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, MyFirstApp
 
 @using MyFirstApp.Models
 @model IndexViewModel
 
-<style>
-    .glyphicon{display:inline-block;padding:0 5px}
-    .glyphicon-chevron-right:after{content:"\00BB";}
-    .glyphicon-chevron-left:before{content:"\00AB";}
-</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
 
 <h1>Users Catalog</h1>
 <form method="get">
@@ -46,26 +44,8 @@
         <tr><td>@u.Name</td><td>@u.Age</td><td>@u.Company?.Name</td></tr>
     }
 </table>
-<p>
-    @if(Model.PageViewModel.HasPreviousPage)
-    {
-        <a asp-action="Index"
-           asp-route-page="@(Model.PageViewModel.PageNumber-1)"
-           asp-route-name="@(Model.FilterViewModel.SelectedName)"
-           asp-route-company="@(Model.FilterViewModel.SelectedCompany)"
-           asp-route-sortorder="@(Model.SortViewModel.Current)"
-           class="glyphicon glyphicon-chevron-left">Back
-        </a>
-    }
-    @if(Model.PageViewModel.HasNextPage)
-    {
-        <a asp-action="Index"
-           asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
-           asp-route-name="@(Model.FilterViewModel.SelectedName)"
-           asp-route-company="@(Model.FilterViewModel.SelectedCompany)"
-           asp-route-sortorder="@(Model.SortViewModel.Current)"
-           class="glyphicon glyphicon-chevron-right">Next
-        </a>
-    }
-</p>
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-name="@(Model.FilterViewModel.SelectedName)"
+           page-url-company="@(Model.FilterViewModel.SelectedCompany)"
+           page-url-sortorder="@(Model.SortViewModel.Current)"></page-link>
 

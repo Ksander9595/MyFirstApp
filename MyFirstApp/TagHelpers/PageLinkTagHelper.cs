@@ -21,6 +21,8 @@ namespace MyFirstApp.TagHelpers
         public PageViewModel? PageModel { get; set; }
         public string PageAction { get; set; }
 
+        [HtmlAttributeName(DictionaryAttributePrefix = "page-url-")]
+        public Dictionary<string, object> PageUrlValues { get; set; } = new();
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             if (PageModel == null) throw new Exception("PageModel is not set");
@@ -47,7 +49,7 @@ namespace MyFirstApp.TagHelpers
             }
             output.Content.AppendHtml(tag);
         }
-        TagBuilder CreateTag(IUrlHelper urlHelper, int pageNumber = 1)
+        TagBuilder CreateTag(IUrlHelper urlHelper, int pageNumber)
         {
             TagBuilder item = new TagBuilder("li");
             TagBuilder link = new TagBuilder("a");
@@ -57,7 +59,8 @@ namespace MyFirstApp.TagHelpers
             }
             else
             {
-                link.Attributes["href"] = urlHelper.Action(PageAction, new { page = pageNumber });
+                PageUrlValues["page"] = pageNumber;
+                link.Attributes["href"] = urlHelper.Action(PageAction, PageUrlValues);
             }
             item.AddCssClass("page-item");
             link.AddCssClass("page-link");
